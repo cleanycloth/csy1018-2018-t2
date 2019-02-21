@@ -2,8 +2,13 @@ function loadjs() {
     element = document.getElementById('circle');
     element.addEventListener('click', test)
     element.style.opacity = '1.0';
+    document.addEventListener('keydown', movekeydown);
+    document.addEventListener('keyup', movekeyup);
+    setInterval(moveInterval, tps);
+
 
 }
+//click stuff
 function test() {
     console.log("You've clicked me!")
     element.style.backgroundColor = 'blue';
@@ -16,34 +21,63 @@ function interval() {
         element.style.opacity = circleOpacity - 0.1;
         element.style.left = positionLeft - 10 + 'px';
     }
-
-
 }
-function keyfinder(event) {
-    timer = 0;
-    clearInterval(timer);
-    console.log(event.keyCode);
-    if (event.keyCode == 37)  {
-        function moveleft() {
-            element.style.left = element.offsetLeft - 10 + 'px';
-                }
-        timer = setInterval(moveleft, 50);
-    }
-    if (event.keyCode == 39 )  {
-        function moveright(){
-            element.style.left = element.offsetLeft + 10 + 'px';
+//end of click stuff
+
+
+timer = 0;
+leftpressed = false;
+rightpressed = false;
+uppressed = false;
+downpressed = false;
+tps = 16; //Divide 1000 by tps to get target frame rate (62.5fps)
+
+    function movekeydown(event) {
+        if (event.keyCode == 37) {
+            leftpressed = true;
         }
-        timer = setInterval(moveright, 50);
-        
+        if (event.keyCode == 39) {
+            rightpressed = true;
+        }
+        if (event.keyCode == 38) {
+            uppressed = true;
+        }
+        if (event.keyCode == 40) {
+            downpressed = true;
+        }
     }
-    if (event.keyCode == 38)  {
-        element.style.top = element.offsetTop - 10 + 'px';
+    function movekeyup(event) {
+        if (event.keyCode == 37) {
+            leftpressed = false;
+        }
+        if (event.keyCode == 39) {
+            rightpressed = false;
+        }
+        if (event.keyCode == 38) {
+            uppressed = false;
+        }
+        if (event.keyCode == 40) {
+            downpressed = false;
+        }
     }
-    if (event.keyCode == 40)  {
-        element.style.top = element.offsetTop + 10 + 'px';
+
+    function moveInterval() {
+        if (leftpressed == true) {
+            positionLeft = parseFloat(element.offsetLeft);
+            element.style.left = positionLeft - 10 + 'px';
+        }
+        if (rightpressed == true) {
+            positionLeft = parseFloat(element.offsetLeft);
+            element.style.left = positionLeft + 10 + 'px';
+        }
+        if (uppressed == true) {
+            element.style.top = element.offsetTop - 10 + 'px';
+        }
+        if (downpressed == true) {
+            element.style.top = element.offsetTop + 10 + 'px';
+        }
     }
-}
+
     //Loads JS content after browser has loaded HTML/CSS content
-    document.addEventListener('keydown', keyfinder);
     document.addEventListener('DOMContentLoaded', loadjs);
     
