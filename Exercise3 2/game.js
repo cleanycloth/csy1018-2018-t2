@@ -2,13 +2,26 @@ function loadjs() {
     playerelement = document.getElementById('player');
     sidemenu = document.getElementById('sidebar');
     hidemenu = document.getElementById('closeside');
+    heads = document.getElementsByClassName('heads');
+    head = heads[0].getElementsByTagName('li');
+    bodies = document.getElementsByClassName('bodies');
+    body = bodies[0].getElementsByTagName('li');
     document.addEventListener('keydown', movekeydown);
     document.addEventListener('keyup', movekeyup);
-    hidemenu.addEventListener('click', hide)
+    hidemenu.addEventListener('click', hide);
     setInterval(moveInterval, tps);
-
-
+    for (var i = 0; i < head.length; i++) {
+        head[i].addEventListener('click', sethead);
+    }
+    for (var i = 0; i < body.length; i++) {
+        body[i].addEventListener('click', setbody);
+    }
 }
+//Keycode list:
+//37 = Left
+//39 = Right
+//38 = Up
+//40 = Down
 //code here
 timer = 0;
 leftpressed = false;
@@ -56,13 +69,22 @@ function hide() {
 function moveInterval() {
     if (leftpressed == true) {
         positionLeft = parseFloat(playerelement.offsetLeft);
-        playerelement.style.left = positionLeft - 2 + 'px';
-        playerelement.className = 'character walk left';
+        newleft = positionLeft - 2;
+        treeelement = document.elementFromPoint(newleft, player.offsetTop);
+        if (treeelement.classList.contains('tree') == false) {
+            playerelement.style.left = newleft + 'px';
+            playerelement.className = 'character walk left';
+        }
+        
     }
     if (rightpressed == true) {
         positionLeft = parseFloat(playerelement.offsetLeft);
-        playerelement.style.left = positionLeft + 2 + 'px';
-        playerelement.className = 'character walk right';
+        newright = positionLeft + 2;
+        treeelement = document.elementFromPoint(newright+32, player.offsetTop);
+        if (treeelement.classList.contains('tree') == false) {
+            playerelement.style.left = newright + 'px';
+            playerelement.className = 'character walk right';
+        }
     }
     if (uppressed == true) {
         playerelement.style.top = playerelement.offsetTop - 2 + 'px';
@@ -72,6 +94,21 @@ function moveInterval() {
         playerelement.style.top = playerelement.offsetTop + 2 + 'px';
         playerelement.className = 'character walk down';
     }
+    /*
+    if (leftpressed || rightpressed || uppressed || downpressed) {
+        playerelement.classList.remove('stand');
+        playerelement.classList.add('walk');
+    }
+    else {
+        playerelement.classList.remove('walk');
+        playerelement.classList.add('stand');
+    }*/
+}
+function sethead() {
+    document.getElementsByClassName('head')[0].style.backgroundImage = 'url(images/' + this.id + '.png)';
+}
+function setbody() {
+    document.getElementsByClassName('body')[0].style.backgroundImage = 'url(images/' + this.id + '.png)';
 }
 
 
