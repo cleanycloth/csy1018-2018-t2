@@ -1,0 +1,27 @@
+@font-face {
+	font-family: ibmvga8;
+	src: url(https://machinecraft.space/ibmvga8.ttf);
+}
+body {
+    font-family: 'ibmvga8', Consolas, Arial;
+    /*font-weight: lighter;*/
+    background-color:#000000;
+    color:#ff0000;
+    text-align: center;
+    line-height: 6px;
+}
+.blink_text {
+    border: 5px solid red;
+    animation: blinking 1s linear infinite;
+  }
+  
+  @keyframes blinking {
+    from,
+    49.9% {
+        border: 5px solid red;
+    }
+    50%,
+    to {
+        border: 5px solid black;
+    }
+  }
