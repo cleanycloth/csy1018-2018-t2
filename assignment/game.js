@@ -4,6 +4,7 @@ var downPressed = false;
 var leftPressed = false;
 var rightPressed = false;
 var spacePressed = false;
+var shiftPressed = false;
 
 function setPlayerDirection(dir) {
 	//Display the walk animation for the correct direction, remove the other directions
@@ -36,6 +37,9 @@ function keyUp(event) {
 	if (event.keyCode == 32) {
 		spacePressed = false;
 	}
+	if (event.keyCode == 16) {
+		shiftPressed = false;
+	}
 }
 
 
@@ -45,22 +49,42 @@ function move() {
 
 	if (downPressed) {
 		setPlayerDirection('down');
-		top = top + 1;
+		if (shiftPressed) {
+			top = top + 2;
+		}
+		else {
+			top = top + 1;
+		}
 	}
 
 	if (upPressed) {
 		setPlayerDirection('up');
-		top = top - 1;
+		if (shiftPressed) {
+			top = top - 2;
+		}
+		else {
+			top = top - 1;
+		}
 	}
 
 	if (leftPressed) {
 		setPlayerDirection('left');
-		left = left - 1;
+		if (shiftPressed) {
+			left = left - 2;
+		}
+		else {
+			left = left - 1;
+		}
 	}
 
 	if (rightPressed) {
 		setPlayerDirection('right');
-		left = left + 1;
+		if (shiftPressed) {
+			left = left + 2;
+		}
+		else {
+			left = left + 1;
+		}
 	}
 	
 	
@@ -115,6 +139,9 @@ function keyDown(event) {
 	if (event.keyCode == 32) {
 		spacePressed = true;
 	}
+	if (event.keyCode == 16) {
+		shiftPressed = true;
+	}
 }
 
 function reload() {
@@ -122,15 +149,15 @@ function reload() {
 }
 x = 0
 function fire(event) {
-	document.removeEventListener('keydown', fire);
-	setTimeout(reload, 500);
 	if (spacePressed) {
 		playerLeftOffset = player.offsetLeft;
 		playerTopOffset = player.offsetTop;
 		var arrow = document.createElement('div');
+		//arrow.setAttribute ('id',x++);
 		arrow.style.top = playerTopOffset + 20 + 'px';
 		arrow.style.left = playerLeftOffset + 15 + 'px';
-		
+		document.removeEventListener('keydown', fire);
+		setTimeout(reload, 500);
 		if (player.classList.contains('left')) {
 			arrow.className = 'arrow left';
 		}
@@ -156,9 +183,10 @@ function fire(event) {
 			var arrowBottomLeft = document.elementFromPoint(arrowLeftOffset, arrowTopOffset+10);
 			var arrowBottomRight = document.elementFromPoint(arrowLeftOffset+10, arrowTopOffset+10);
 			if (!arrowTopLeft.classList.contains('blocking') && !arrowTopRight.classList.contains('blocking')
-		&& !arrowBottomLeft.classList.contains('blocking') && !arrowBottomRight.classList.contains('blocking')) {
-			
-			if (arrow.classList.contains('up')){
+			&& !arrowBottomLeft.classList.contains('blocking') && !arrowBottomRight.classList.contains('blocking')
+			&& !arrowTopLeft.classList.contains('enemy') && !arrowTopRight.classList.contains('enemy')
+			&& !arrowBottomLeft.classList.contains('enemy') && !arrowBottomRight.classList.contains('enemy')) {
+				if (arrow.classList.contains('up')){
 					arrowTopOffset = arrowTopOffset - 2;
 				}
 				else if (arrow.classList.contains('right')){
@@ -172,9 +200,23 @@ function fire(event) {
 				}
 				arrow.style.left = arrowLeftOffset + 'px';
 				arrow.style.top = arrowTopOffset + 'px';
-		}
+				}
+			
+			if (arrow.style.left == '10px' || arrow.style.top == '10px') {
+				body.removeChild(arrow);
+			}
+			if (arrowTopLeft.classList.contains('enemy') || arrowTopRight.classList.contains('enemy')
+				|| arrowBottomLeft.classList.contains('enemy') || arrowBottomRight.classList.contains('enemy')) {
+					console.log("FARTS");
+				}
+			//else {
+				
+
+
+				
+			//}
 		}, 1);
-		}
+	}
 }
 
 
