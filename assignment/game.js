@@ -95,7 +95,6 @@ function move() {
 
 }
 
-
 function keyDown(event) {
 	if (event.keyCode == 37) {
 		leftPressed = true;
@@ -118,15 +117,20 @@ function keyDown(event) {
 	}
 }
 
-function fire() {
+function reload() {
+	document.addEventListener('keydown', fire);
+}
+x = 0
+function fire(event) {
+	document.removeEventListener('keydown', fire);
+	setTimeout(reload, 500);
 	if (spacePressed) {
 		playerLeftOffset = player.offsetLeft;
 		playerTopOffset = player.offsetTop;
-
 		var arrow = document.createElement('div');
-		arrow.style.top = playerTopOffset + 'px';
-		arrow.style.left = playerLeftOffset + 'px';
-
+		arrow.style.top = playerTopOffset + 20 + 'px';
+		arrow.style.left = playerLeftOffset + 15 + 'px';
+		
 		if (player.classList.contains('left')) {
 			arrow.className = 'arrow left';
 		}
@@ -144,29 +148,31 @@ function fire() {
 
 		body.appendChild(arrow);
 
-		var fireinterval = setInterval(function(){
+		setInterval(function(){
 			var arrowTopOffset = arrow.offsetTop;
 			var arrowLeftOffset = arrow.offsetLeft;
+			var arrowTopLeft = document.elementFromPoint(arrowLeftOffset, arrowTopOffset);
+			var arrowTopRight = document.elementFromPoint(arrowLeftOffset+10, arrowTopOffset);
+			var arrowBottomLeft = document.elementFromPoint(arrowLeftOffset, arrowTopOffset+10);
+			var arrowBottomRight = document.elementFromPoint(arrowLeftOffset+10, arrowTopOffset+10);
+			if (!arrowTopLeft.classList.contains('blocking') && !arrowTopRight.classList.contains('blocking')
+		&& !arrowBottomLeft.classList.contains('blocking') && !arrowBottomRight.classList.contains('blocking')) {
 			
-			if (arrow.classList.contains('up'))
-			{
-				arrowTopOffset = arrowTopOffset - 1;
-			}
-			else if (arrow.classList.contains('right'))
-			{
-				arrowLeftOffset = arrowLeftOffset + 1;
-			}
-			else if (arrow.classList.contains('down'))
-			{
-				arrowTopOffset = arrowTopOffset + 1;
-			}
-			else if (arrow.classList.contains('left'))
-			{
-				arrowLeftOffset = arrowLeftOffset - 1;
-			}
-			
-			arrow.style.left = arrowLeftOffset + 'px';
-			arrow.style.top = arrowTopOffset + 'px';
+			if (arrow.classList.contains('up')){
+					arrowTopOffset = arrowTopOffset - 2;
+				}
+				else if (arrow.classList.contains('right')){
+					arrowLeftOffset = arrowLeftOffset + 2;
+				}
+				else if (arrow.classList.contains('down')){
+					arrowTopOffset = arrowTopOffset + 2;
+				}
+				else if (arrow.classList.contains('left')){
+					arrowLeftOffset = arrowLeftOffset - 2;
+				}
+				arrow.style.left = arrowLeftOffset + 'px';
+				arrow.style.top = arrowTopOffset + 'px';
+		}
 		}, 1);
 		}
 }
@@ -175,8 +181,9 @@ function fire() {
 function gameStart() {
 	player = document.getElementById('player');
 	setInterval(move, 10);
-	setInterval(fire, 500)
+	//setInterval(fire, 50);
 	document.addEventListener('keydown', keyDown);
+	document.addEventListener('keydown', fire);
 	document.addEventListener('keyup', keyUp);
 }
 
