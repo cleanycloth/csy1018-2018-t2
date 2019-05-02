@@ -5,6 +5,8 @@ var leftPressed = false;
 var rightPressed = false;
 var spacePressed = false;
 var shiftPressed = false;
+var DeathCount = 0;
+var enemies = [];
 
 function setPlayerDirection(dir) {
 	//Display the walk animation for the correct direction, remove the other directions
@@ -42,7 +44,6 @@ function keyUp(event) {
 	}
 }
 
-
 function move() {
 	var left = player.offsetLeft;
 	var top = player.offsetTop;
@@ -56,7 +57,6 @@ function move() {
 			top = top + 1;
 		}
 	}
-
 	if (upPressed) {
 		setPlayerDirection('up');
 		if (shiftPressed) {
@@ -66,7 +66,6 @@ function move() {
 			top = top - 1;
 		}
 	}
-
 	if (leftPressed) {
 		setPlayerDirection('left');
 		if (shiftPressed) {
@@ -76,7 +75,6 @@ function move() {
 			left = left - 1;
 		}
 	}
-
 	if (rightPressed) {
 		setPlayerDirection('right');
 		if (shiftPressed) {
@@ -86,17 +84,12 @@ function move() {
 			left = left + 1;
 		}
 	}
-	
-	
-
 	//Get the the element at the coordinates for where the play will move to
 	//All 4 corners of the player are required to check there is no collision on any side
 	var playerTopLeft = document.elementFromPoint(left, top);
 	var playerTopRight = document.elementFromPoint(left+32, top);
 	var playerBottomLeft = document.elementFromPoint(left, top+48);
 	var playerBottomRight = document.elementFromPoint(left+32, top+48);
-
-
 	//If the element that the player is about to walk over contains the class "blocking" then
 	// the player is not moved.
 	// The player will only be moved to coordinates `top` and `left` if the element in that position is not blocking
@@ -105,7 +98,6 @@ function move() {
 		player.style.left = left + 'px';
 		player.style.top = top + 'px';
 	}
-
 	//If any of the keys are being pressed, display the walk animation
 	if (leftPressed || rightPressed || upPressed || downPressed) {
 		player.classList.add('walk');
@@ -150,10 +142,10 @@ function reload() {
 x = 0
 function fire(event) {
 	if (spacePressed) {
+		test = true;
 		playerLeftOffset = player.offsetLeft;
 		playerTopOffset = player.offsetTop;
 		var arrow = document.createElement('div');
-		//arrow.setAttribute ('id',x++);
 		arrow.style.top = playerTopOffset + 20 + 'px';
 		arrow.style.left = playerLeftOffset + 15 + 'px';
 		document.removeEventListener('keydown', fire);
@@ -170,11 +162,8 @@ function fire(event) {
 		if (player.classList.contains('down')) {
 			arrow.className = 'arrow down';
 		}
-		//arrow.className = 'arrow';
 		var body = document.getElementsByTagName('body')[0];
-
 		body.appendChild(arrow);
-
 		setInterval(function(){
 			var arrowTopOffset = arrow.offsetTop;
 			var arrowLeftOffset = arrow.offsetLeft;
@@ -182,6 +171,10 @@ function fire(event) {
 			var arrowTopRight = document.elementFromPoint(arrowLeftOffset+10, arrowTopOffset);
 			var arrowBottomLeft = document.elementFromPoint(arrowLeftOffset, arrowTopOffset+10);
 			var arrowBottomRight = document.elementFromPoint(arrowLeftOffset+10, arrowTopOffset+10);
+			console.log(document.documentElement.clientHeight-10+'px');
+			if (arrow.style.left == '10px' || arrow.style.left == '11px' || arrow.style.top == '10px' || arrow.style.top == '11px' || arrow.style.top == '950px' || arrow.style.top == '951px') {
+				body.removeChild(arrow);
+			}
 			if (!arrowTopLeft.classList.contains('blocking') && !arrowTopRight.classList.contains('blocking')
 			&& !arrowBottomLeft.classList.contains('blocking') && !arrowBottomRight.classList.contains('blocking')
 			&& !arrowTopLeft.classList.contains('enemy') && !arrowTopRight.classList.contains('enemy')
@@ -200,36 +193,54 @@ function fire(event) {
 				}
 				arrow.style.left = arrowLeftOffset + 'px';
 				arrow.style.top = arrowTopOffset + 'px';
-				}
-			
-			if (arrow.style.left == '10px' || arrow.style.top == '10px') {
-				body.removeChild(arrow);
 			}
 			if (arrowTopLeft.classList.contains('enemy') || arrowTopRight.classList.contains('enemy')
 				|| arrowBottomLeft.classList.contains('enemy') || arrowBottomRight.classList.contains('enemy')) {
-					console.log("FARTS");
+					if (arrowTopLeft.id.length != 0) {
+						ToRemove = document.getElementById(arrowTopLeft.id);
+					}
+					if (arrowTopRight.id.length != 0) {
+						ToRemove = document.getElementById(arrowTopRight.id);
+					}
+					if (arrowBottomLeft.id.length != 0) {
+						ToRemove = document.getElementById(arrowBottomLeft.id);
+					}
+					if (arrowBottomRight.id.length != 0) {
+						ToRemove = document.getElementById(arrowBottomRight.id);
+					}
+					body.removeChild(arrow);
+					ToRemove.classList.add("dead");
+					setTimeout(remove, 2000);
+					DeathCount++;
+					function remove() {
+						body.removeChild(ToRemove);
+						if (DeathCount == 9) {
+							if (confirm("You win! Do you want to play again?")) {
+								window.location.reload(true);
+							}
+							else {
+								alert("I can't close the window myself because that's been disabled. So uh...you can close me I guess.")
+							}
+					
+						}
+				
+					}				
 				}
-			//else {
-				
-
-
-				
-			//}
 		}, 1);
 	}
+	
 }
-
 
 function gameStart() {
 	player = document.getElementById('player');
 	setInterval(move, 10);
-	//setInterval(fire, 50);
 	document.addEventListener('keydown', keyDown);
 	document.addEventListener('keydown', fire);
 	document.addEventListener('keyup', keyUp);
+	for (x=0; x < document.getElementsByClassName('enemy').length; x++) {
+		newID = document.getElementsByClassName('enemy')[x];
+		newID.setAttribute("id",x);
+	}
 }
 
-
 document.addEventListener('DOMContentLoaded', gameStart);
-
-
