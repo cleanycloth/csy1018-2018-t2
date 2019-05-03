@@ -172,7 +172,7 @@ function fire(event) {
 			var arrowTopRight = document.elementFromPoint(arrowLeftOffset+10, arrowTopOffset);
 			var arrowBottomLeft = document.elementFromPoint(arrowLeftOffset, arrowTopOffset+10);
 			var arrowBottomRight = document.elementFromPoint(arrowLeftOffset+10, arrowTopOffset+10);
-			if (arrow.style.left == '10px' || arrow.style.left == '11px' || arrow.style.top == '10px' || arrow.style.top == '11px' || arrow.style.top == '950px' || arrow.style.top == '951px') {
+			if (arrow.style.left == '10px' || arrow.style.left == '11px' || arrow.style.top == '10px' || arrow.style.top == '11px' || arrow.style.top == window.innerHeight - 15 + 'px' || arrow.style.top == window.innerHeight - 16 + 'px') {
 				body.removeChild(arrow);
 			}
 			if (!arrowTopLeft.classList.contains('blocking') && !arrowTopRight.classList.contains('blocking')
