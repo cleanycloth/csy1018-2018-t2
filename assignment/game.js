@@ -6,6 +6,7 @@ var rightPressed = false;
 var spacePressed = false;
 var shiftPressed = false;
 var deathCount = 0;
+var invulnerable = true;
 
 function setPlayerDirection(dir) {
 	//Display the walk animation for the correct direction, remove the other directions
@@ -186,44 +187,48 @@ function fire(event) {
 				//Depending on the arrow direction, move the arrow in the correct direction. Top/left is based at 0,0 so 
 				//-2 on arrowOffsetTop moves the arrow up 2px, 2 moves down 2px. -2 on arrowOffsetLeft moves the arrow left, 2 moves right.
 				if (arrow.classList.contains('up')){
-					arrowTopOffset = arrowTopOffset - 2;
+					arrowTopOffset -= 2;
 				}
 				else if (arrow.classList.contains('right')){
-					arrowLeftOffset = arrowLeftOffset + 2;
+					arrowLeftOffset += 2;
 				}
 				else if (arrow.classList.contains('down')){
-					arrowTopOffset = arrowTopOffset + 2;
+					arrowTopOffset += 2;
 				}
 				else if (arrow.classList.contains('left')){
-					arrowLeftOffset = arrowLeftOffset - 2;
+					arrowLeftOffset -= 2;
 				}
 				arrow.style.left = arrowLeftOffset + 'px';
 				arrow.style.top = arrowTopOffset + 'px';
 			}
 			//Run the collision check function. If it returns enemyonly (i.e. if the arrow is detected to only be touching an enemy), continue.
 			if (collisioncheck() == "enemyonly") {
-					//Depending on the arrow direction, one of the corners will detect the enemy but the others won't. So, detect all four and
-					//if the corners do not detect an ID, the length is 0. If it detects an ID, it will have a length of 1 and will set the ID it detects
-					//as the ID to be changed.
-					if (arrowTopLeft.id.length != 0) {
-						ToRemove = document.getElementById(arrowTopLeft.id);
-					}
-					if (arrowTopRight.id.length != 0) {
-						ToRemove = document.getElementById(arrowTopRight.id);
-					}
-					if (arrowBottomLeft.id.length != 0) {
-						ToRemove = document.getElementById(arrowBottomLeft.id);
-					}
-					if (arrowBottomRight.id.length != 0) {
-						ToRemove = document.getElementById(arrowBottomRight.id);
-					}
-					//Remove the arrow from the screen.
-					body.removeChild(arrow);
+				//Depending on the arrow direction, one of the corners will detect the enemy but the others won't. So, detect all four and
+				//if the corners do not detect an ID, the length is 0. If it detects an ID, it will have a length of 1 and will set the ID it detects
+				//as the ID to be changed.
+				if (arrowTopLeft.id.length != 0) {
+					ToRemove = document.getElementById(arrowTopLeft.id);
+				}
+				if (arrowTopRight.id.length != 0) {
+					ToRemove = document.getElementById(arrowTopRight.id);
+				}
+				if (arrowBottomLeft.id.length != 0) {
+					ToRemove = document.getElementById(arrowBottomLeft.id);
+				}
+				if (arrowBottomRight.id.length != 0) {
+					ToRemove = document.getElementById(arrowBottomRight.id);
+				}
+				//Remove the arrow from the screen.
+				body.removeChild(arrow);
+				//Check if players are invulnerable from the 4 second delay at the start. Also check if
+				//the enemy it rolls over isn't already dead to avoid adding an extra count to the death counter.
+				if (invulnerable == false && !ToRemove.classList.contains("dead")) {
 					//Give the ID set above the "dead" class, which adds a dead animation.
 					ToRemove.classList.add("dead");
 					//After 1 second, run the remove function.
 					setTimeout(remove, 1000);
 					//Add 1 to the death count.
+					console.log(deathCount);
 					deathCount++;
 					function remove() {
 						//Remove the enemy off the screen using the ID set earlier.
@@ -242,8 +247,9 @@ function fire(event) {
 					
 						}
 				
-					}				
-				}
+					}
+				}				
+			}
 		}, 1);
 	}
 	
@@ -278,6 +284,12 @@ function gameStart() {
 	document.addEventListener('keydown', keyDown);
 	document.addEventListener('keydown', fire);
 	document.addEventListener('keyup', keyUp);
+	//For the first 4 seconds, players cannot kill the enemies when they are hidden.
+	setTimeout(vulnerability, 4000);
+	function vulnerability() {
+		//Set the enemies to be killable after 4 seconds.
+		invulnerable = false;
+	}
 	//Give each enemy on screen an ID, from 0-8.
 	for (x=0; x < document.getElementsByClassName('enemy').length; x++) {
 		newID = document.getElementsByClassName('enemy')[x];
