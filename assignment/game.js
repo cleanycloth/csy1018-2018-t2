@@ -138,11 +138,12 @@ function keyDown(event) {
 
 function reload() {
 	document.addEventListener('keydown', fire);
+	player.classList.remove('fire');
 }
 x = 0
 function fire(event) {
 	if (spacePressed) {
-		test = true;
+		player.classList.add('fire');
 		playerLeftOffset = player.offsetLeft;
 		playerTopOffset = player.offsetTop;
 		var arrow = document.createElement('div');
@@ -171,7 +172,6 @@ function fire(event) {
 			var arrowTopRight = document.elementFromPoint(arrowLeftOffset+10, arrowTopOffset);
 			var arrowBottomLeft = document.elementFromPoint(arrowLeftOffset, arrowTopOffset+10);
 			var arrowBottomRight = document.elementFromPoint(arrowLeftOffset+10, arrowTopOffset+10);
-			console.log(document.documentElement.clientHeight-10+'px');
 			if (arrow.style.left == '10px' || arrow.style.left == '11px' || arrow.style.top == '10px' || arrow.style.top == '11px' || arrow.style.top == '950px' || arrow.style.top == '951px') {
 				body.removeChild(arrow);
 			}
@@ -210,7 +210,7 @@ function fire(event) {
 					}
 					body.removeChild(arrow);
 					ToRemove.classList.add("dead");
-					setTimeout(remove, 2000);
+					setTimeout(remove, 1000);
 					DeathCount++;
 					function remove() {
 						body.removeChild(ToRemove);
