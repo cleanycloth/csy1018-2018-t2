@@ -5,8 +5,7 @@ var leftPressed = false;
 var rightPressed = false;
 var spacePressed = false;
 var shiftPressed = false;
-var DeathCount = 0;
-var enemies = [];
+var deathCount = 0;
 
 function setPlayerDirection(dir) {
 	//Display the walk animation for the correct direction, remove the other directions
@@ -19,23 +18,20 @@ function setPlayerDirection(dir) {
 	player.classList.add(dir);
 }
 
+//Monitors keypresses. If the keyUp event occurs (a key is let go), it sets the respective key set status to false.
 function keyUp(event) {
 	if (event.keyCode == 37) {
 		leftPressed = false;
 	}
-
 	if (event.keyCode == 39) {
 		rightPressed = false;
 	}
-
 	if (event.keyCode == 38) {
 		upPressed = false;
 	}
-
 	if (event.keyCode == 40) {
 		downPressed = false;
 	}
-
 	if (event.keyCode == 32) {
 		spacePressed = false;
 	}
@@ -47,7 +43,7 @@ function keyUp(event) {
 function move() {
 	var left = player.offsetLeft;
 	var top = player.offsetTop;
-
+	//With all buttons, if shift is pressed, movement speed is doubled.
 	if (downPressed) {
 		setPlayerDirection('down');
 		if (shiftPressed) {
@@ -111,23 +107,20 @@ function move() {
 
 }
 
+//Monitors keypresses. If the keyDown event occurs (a key is pressed), it sets the respective key set status to true.
 function keyDown(event) {
 	if (event.keyCode == 37) {
 		leftPressed = true;
 	}
-
 	if (event.keyCode == 39) {
 		rightPressed = true;
 	}
-
 	if (event.keyCode == 38) {
 		upPressed = true;
 	}
-
 	if (event.keyCode == 40) {
 		downPressed = true;
 	}
-	
 	if (event.keyCode == 32) {
 		spacePressed = true;
 	}
@@ -135,22 +128,29 @@ function keyDown(event) {
 		shiftPressed = true;
 	}
 }
-
+//Stops the player from being able to spam the fire key. The function is given a 500ms timeout.
 function reload() {
+	//Readds the event listener disabled in fire(), and removes the animation from the player.
 	document.addEventListener('keydown', fire);
 	player.classList.remove('fire');
 }
-x = 0
 function fire(event) {
+	//If the space bar is pressed, continue.
 	if (spacePressed) {
+		//Add the fire class to the player, making the player animate.
 		player.classList.add('fire');
+		//Set offsets of player.
 		playerLeftOffset = player.offsetLeft;
 		playerTopOffset = player.offsetTop;
+		//Create the arrow div.
 		var arrow = document.createElement('div');
+		//Set the position of the arrow to be 20px in front of the player from the top, 15px in front from the left.
 		arrow.style.top = playerTopOffset + 20 + 'px';
 		arrow.style.left = playerLeftOffset + 15 + 'px';
+		//Disallow the player to spam the fire button. Add a 500ms timeout.
 		document.removeEventListener('keydown', fire);
 		setTimeout(reload, 500);
+		//Depending on the player direction, make the arrow point in the correct direction.
 		if (player.classList.contains('left')) {
 			arrow.className = 'arrow left';
 		}
@@ -163,22 +163,28 @@ function fire(event) {
 		if (player.classList.contains('down')) {
 			arrow.className = 'arrow down';
 		}
+		//Choose the body element.
 		var body = document.getElementsByTagName('body')[0];
+		//Put the arrow on screen, under the body tag.
 		body.appendChild(arrow);
+		//Run this code every 1ms.
 		setInterval(function(){
-			var arrowTopOffset = arrow.offsetTop;
-			var arrowLeftOffset = arrow.offsetLeft;
-			var arrowTopLeft = document.elementFromPoint(arrowLeftOffset, arrowTopOffset);
-			var arrowTopRight = document.elementFromPoint(arrowLeftOffset+10, arrowTopOffset);
-			var arrowBottomLeft = document.elementFromPoint(arrowLeftOffset, arrowTopOffset+10);
-			var arrowBottomRight = document.elementFromPoint(arrowLeftOffset+10, arrowTopOffset+10);
+			//Find the offset of the arrow.
+			arrowTopOffset = arrow.offsetTop;
+			arrowLeftOffset = arrow.offsetLeft;
+			//Set the four corners of the arrow for use later in collision checking.
+			arrowTopLeft = document.elementFromPoint(arrowLeftOffset, arrowTopOffset);
+			arrowTopRight = document.elementFromPoint(arrowLeftOffset+10, arrowTopOffset);
+			arrowBottomLeft = document.elementFromPoint(arrowLeftOffset, arrowTopOffset+10);
+			arrowBottomRight = document.elementFromPoint(arrowLeftOffset+10, arrowTopOffset+10);
+			//If the arrow reaches the top or left side of the screen, or the bottom, delete the arrow.
 			if (arrow.style.left == '10px' || arrow.style.left == '11px' || arrow.style.top == '10px' || arrow.style.top == '11px' || arrow.style.top == window.innerHeight - 15 + 'px' || arrow.style.top == window.innerHeight - 16 + 'px') {
 				body.removeChild(arrow);
 			}
-			if (!arrowTopLeft.classList.contains('blocking') && !arrowTopRight.classList.contains('blocking')
-			&& !arrowBottomLeft.classList.contains('blocking') && !arrowBottomRight.classList.contains('blocking')
-			&& !arrowTopLeft.classList.contains('enemy') && !arrowTopRight.classList.contains('enemy')
-			&& !arrowBottomLeft.classList.contains('enemy') && !arrowBottomRight.classList.contains('enemy')) {
+			//Run the collision check function. If it returns false (i.e. the arrow is not touching a tree or enemy), continue.
+			if (collisioncheck() == false) {
+				//Depending on the arrow direction, move the arrow in the correct direction. Top/left is based at 0,0 so 
+				//-2 on arrowOffsetTop moves the arrow up 2px, 2 moves down 2px. -2 on arrowOffsetLeft moves the arrow left, 2 moves right.
 				if (arrow.classList.contains('up')){
 					arrowTopOffset = arrowTopOffset - 2;
 				}
@@ -194,8 +200,11 @@ function fire(event) {
 				arrow.style.left = arrowLeftOffset + 'px';
 				arrow.style.top = arrowTopOffset + 'px';
 			}
-			if (arrowTopLeft.classList.contains('enemy') || arrowTopRight.classList.contains('enemy')
-				|| arrowBottomLeft.classList.contains('enemy') || arrowBottomRight.classList.contains('enemy')) {
+			//Run the collision check function. If it returns enemyonly (i.e. if the arrow is detected to only be touching an enemy), continue.
+			if (collisioncheck() == "enemyonly") {
+					//Depending on the arrow direction, one of the corners will detect the enemy but the others won't. So, detect all four and
+					//if the corners do not detect an ID, the length is 0. If it detects an ID, it will have a length of 1 and will set the ID it detects
+					//as the ID to be changed.
 					if (arrowTopLeft.id.length != 0) {
 						ToRemove = document.getElementById(arrowTopLeft.id);
 					}
@@ -208,18 +217,27 @@ function fire(event) {
 					if (arrowBottomRight.id.length != 0) {
 						ToRemove = document.getElementById(arrowBottomRight.id);
 					}
+					//Remove the arrow from the screen.
 					body.removeChild(arrow);
+					//Give the ID set above the "dead" class, which adds a dead animation.
 					ToRemove.classList.add("dead");
+					//After 1 second, run the remove function.
 					setTimeout(remove, 1000);
-					DeathCount++;
+					//Add 1 to the death count.
+					deathCount++;
 					function remove() {
+						//Remove the enemy off the screen using the ID set earlier.
 						body.removeChild(ToRemove);
-						if (DeathCount == 9) {
+						//If the death count is 9, i.e. all of the enemies are killed, continue.
+						if (deathCount == 9) {
+							//If the user presses "OK" on the popup, the page will refresh. If not, it will display another message.
+							//Most, if not all web browsers now do not allow you to use close(); to close a window as this is considered a security risk.
+							//So, the user is prompted to close the window themselves.
 							if (confirm("You win! Do you want to play again?")) {
 								window.location.reload(true);
 							}
 							else {
-								alert("I can't close the window myself because that's been disabled. So uh...you can close me I guess.")
+								alert("I can't close the window myself because that's been disabled. So uh...you can close me I guess.");
 							}
 					
 						}
@@ -231,16 +249,40 @@ function fire(event) {
 	
 }
 
+function collisioncheck() {
+	//If any of the four corners of the arrow are NOT touching the trees ("blocking"), or if any of the four corners are NOT touching an enemy,
+	//return false.
+	if (!arrowTopLeft.classList.contains('blocking') && !arrowTopRight.classList.contains('blocking')
+	&& !arrowBottomLeft.classList.contains('blocking') && !arrowBottomRight.classList.contains('blocking')
+	&& !arrowTopLeft.classList.contains('enemy') && !arrowTopRight.classList.contains('enemy')
+	&& !arrowBottomLeft.classList.contains('enemy') && !arrowBottomRight.classList.contains('enemy')) {
+		return false;
+	}
+	//If any of the four corners of the arrow ARE touching an enemy, return "enemyonly".
+	else if (arrowTopLeft.classList.contains('enemy') || arrowTopRight.classList.contains('enemy')
+	|| arrowBottomLeft.classList.contains('enemy') || arrowBottomRight.classList.contains('enemy')) {
+		return "enemyonly";
+	}
+	//Otherwise (if the arrow IS touching the trees), return true (i.e. "yes, the arrow is NOT touching anything")
+	else {
+		return true;
+	}
+}
+//Run this function at game start.
 function gameStart() {
+	//Define what the player is by grabbing the player on screen via its ID.
 	player = document.getElementById('player');
+	//Run the move function every 10ms.
 	setInterval(move, 10);
+	//Add event listeners so that when a key is pressed down, keyDown and Fire will run. When the key is lifted, run keyUp.
 	document.addEventListener('keydown', keyDown);
 	document.addEventListener('keydown', fire);
 	document.addEventListener('keyup', keyUp);
+	//Give each enemy on screen an ID, from 0-8.
 	for (x=0; x < document.getElementsByClassName('enemy').length; x++) {
 		newID = document.getElementsByClassName('enemy')[x];
 		newID.setAttribute("id",x);
 	}
 }
-
+//Run the GameStart function at page load.
 document.addEventListener('DOMContentLoaded', gameStart);
