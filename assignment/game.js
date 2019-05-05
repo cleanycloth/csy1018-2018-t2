@@ -179,7 +179,8 @@ function fire(event) {
 			arrowBottomLeft = document.elementFromPoint(arrowLeftOffset, arrowTopOffset+10);
 			arrowBottomRight = document.elementFromPoint(arrowLeftOffset+10, arrowTopOffset+10);
 			//If the arrow reaches the top or left side of the screen, or the bottom, delete the arrow.
-			if (arrow.style.left == '10px' || arrow.style.left == '11px' || arrow.style.top == '10px' || arrow.style.top == '11px' || arrow.style.top == window.innerHeight - 15 + 'px' || arrow.style.top == window.innerHeight - 16 + 'px') {
+			if (arrow.style.left == '10px' || arrow.style.left == '11px' || arrow.style.top == '10px' || arrow.style.top == '11px' 
+			|| arrow.style.top == window.innerHeight - 15 + 'px' || arrow.style.top == window.innerHeight - 16 + 'px') {
 				body.removeChild(arrow);
 			}
 			//Run the collision check function. If it returns false (i.e. the arrow is not touching a tree or enemy), continue.
@@ -228,7 +229,6 @@ function fire(event) {
 					//After 1 second, run the remove function.
 					setTimeout(remove, 1000);
 					//Add 1 to the death count.
-					console.log(deathCount);
 					deathCount++;
 					function remove() {
 						//Remove the enemy off the screen using the ID set earlier.
@@ -256,20 +256,20 @@ function fire(event) {
 }
 
 function collisioncheck() {
-	//If any of the four corners of the arrow are NOT touching the trees ("blocking"), or if any of the four corners are NOT touching an enemy,
-	//return false.
+	//If any of the four corners of the arrow are NOT touching the trees ("blocking"), 
+	//AND if any of the four corners are NOT touching an enemy, return false.
 	if (!arrowTopLeft.classList.contains('blocking') && !arrowTopRight.classList.contains('blocking')
 	&& !arrowBottomLeft.classList.contains('blocking') && !arrowBottomRight.classList.contains('blocking')
 	&& !arrowTopLeft.classList.contains('enemy') && !arrowTopRight.classList.contains('enemy')
 	&& !arrowBottomLeft.classList.contains('enemy') && !arrowBottomRight.classList.contains('enemy')) {
 		return false;
 	}
-	//If any of the four corners of the arrow ARE touching an enemy, return "enemyonly".
+	//If any of the four corners of the arrow ARE touching an enemy ONLY, return "enemyonly".
 	else if (arrowTopLeft.classList.contains('enemy') || arrowTopRight.classList.contains('enemy')
 	|| arrowBottomLeft.classList.contains('enemy') || arrowBottomRight.classList.contains('enemy')) {
 		return "enemyonly";
 	}
-	//Otherwise (if the arrow IS touching the trees), return true (i.e. "yes, the arrow is NOT touching anything")
+	//Otherwise (if the arrow IS touching the trees), return true (i.e. "yes, the arrow IS touching something")
 	else {
 		return true;
 	}
